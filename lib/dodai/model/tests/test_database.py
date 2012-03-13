@@ -26,7 +26,7 @@ from dodai.model.database import GetAllDatabaseSections
 class _BaseTest(unittest.TestCase):
 
     def setUp(self):
-        self.is_database_section = IsDatabaseSection(self.sections)
+        self.is_database_section = IsDatabaseSection.load(self.sections)
 
     @property
     def sections(self):

@@ -1,4 +1,4 @@
-# Copyright (C) 2011 Leonard Thomas
+# Copyright (C) 2012 Leonard Thomas
 #
 # This file is part of Dodai.
 #
@@ -19,10 +19,11 @@ import os
 import sys
 import random
 import configparser
+import unittest
 from collections import OrderedDict
 from dodai.util import find
 
-class TstProjectBase(object):
+class _Base(object):
 
     def _build_random_text(self, min=5, max=15):
         """Build random text
@@ -45,7 +46,7 @@ class TstProjectBase(object):
             return self._build_random_character()
 
 
-class TstProjectSection(TstProjectBase):
+class _ProjectSection(_Base):
     """Callable object used to create a section of data
     """
     SECTION_TYPES = ('basic', 'db', 'db_file')
@@ -78,7 +79,7 @@ class TstProjectSection(TstProjectBase):
     def _build_db(self, section_name):
         out = OrderedDict()
         out[section_name] = OrderedDict()
-        out[section_name]['db_dialect'] = random.choice(self.PROTOCOLS)
+        out[section_name]['dialect'] = random.choice(self.PROTOCOLS)
         out[section_name]['hostname'] = self._build_random_text(5, 10)
         out[section_name]['port'] = random.randint(1, 65535)
         out[section_name]['username'] = self._build_random_text(5, 10)
@@ -90,8 +91,8 @@ class TstProjectSection(TstProjectBase):
     def _build_db_file(self, section_name):
         out = OrderedDict()
         out[section_name] = OrderedDict()
-        out[section_name]['db_dialect'] = 'sqlite'
-        out[section_name]['filename'] = self._build_db_filename()
+        out[section_name]['dialect'] = 'sqlite'
+        out[section_name]['path'] = self._build_db_filename()
         return out
 
     def _build_db_filename(self):
@@ -127,7 +128,7 @@ class TstProjectSection(TstProjectBase):
             return key
 
 
-class TstProjectConfigFile(TstProjectBase):
+class _ProjectConfigFile(_Base):
     """Callable object used to create a config file
     """
 
@@ -136,7 +137,7 @@ class TstProjectConfigFile(TstProjectBase):
         self.data = data
         self.db_data = db_data
         self.encoding = encoding
-        self._build_section = TstProjectSection(self.project_config_directory,
+        self._build_section = _ProjectSection(self.project_config_directory,
                                                 self.data, self.db_data,
                                                 self.encoding)
 
@@ -152,7 +153,7 @@ class TstProjectConfigFile(TstProjectBase):
         data = OrderedDict()
         section_count = random.randint(10, 25)
         for x in range(0, section_count):
-            section_type = random.choice(TstProjectSection.SECTION_TYPES)
+            section_type = random.choice(_ProjectSection.SECTION_TYPES)
             section_data = self._build_section(section_type)
             data.update(section_data)
             if section_type in ('db', 'db_file'):
@@ -161,7 +162,7 @@ class TstProjectConfigFile(TstProjectBase):
         return data
 
 
-class TstProject(TstProjectBase):
+class _Project(_Base):
     """Object used to generate a random project along with all of it's config
     files for testing.
     """
@@ -179,7 +180,7 @@ class TstProject(TstProjectBase):
         """Property holding callable class that builds a config file
         """
         if not self._build_config_file_:
-            self._build_config_file_ = TstProjectConfigFile(
+            self._build_config_file_ = _ProjectConfigFile(
                     self.project_config_directory, self.data, self.db_data,
                     self.encoding)
         return self._build_config_file_
@@ -195,7 +196,7 @@ class TstProject(TstProjectBase):
         return self._encoding_
 
     @property
-    def project_name(self):
+    def name(self):
         """Property holding the randomly generated project name
         """
         if not self._project_name_:
@@ -209,7 +210,7 @@ class TstProject(TstProjectBase):
         """
         if not self._project_config_directory_:
             self._project_config_directory_ = find.home_direcotry(
-                            project_name=self.project_name)
+                            project_name=self.name)
         return self._project_config_directory_
 
     @property
@@ -271,14 +272,9 @@ class TstProject(TstProjectBase):
                     os.rmdir(os.path.join(root, name))
             os.rmdir(dir)
 
-    def setup(self):
-        """This is the main function used to build all of the test config
-        files
+    def reset_data(self):
+        """Reset any data
         """
-
-        self.clean_up()
-
-        # Reset all the class variables
         self._project_name_ = None
         self._project_config_directory_ = None
         self._project_config_files_ = []
@@ -286,14 +282,37 @@ class TstProject(TstProjectBase):
         self.db_data = OrderedDict()
         self._build_config_file_ = None
 
+
+    def build_files(self):
+        """This is the main function used to build all of the test config
+        files
+        """
         # Loop through each config file name and build the names
         for config_file in self.project_config_files:
             self._build_config_file(config_file)
 
-    def teardown(self):
-        """Used after all of the testing is done to clean up directories
-        by deleting them.
-        """
-        # Clean up any test config directories that may exist
-        self.clean_up()
+
+
+class RandomProject(unittest.TestCase):
+
+    @property
+    def project(self):
+        if not hasattr(self, 'project__') or not self.project__:
+            self.project__ = _Project()
+        return self.project__
+
+
+    def setUp(self):
+
+        # Clean up any old test config directories
+        self.project.clean_up()
+
+        # Build the config files
+        self.project.build_files()
+
+    def tearDown(self):
+
+        # Clean up any test config directories
+        self.project.clean_up()
+
 
