@@ -25,7 +25,6 @@ class TestParse(RandomProject):
         parse_data = Parse(self.project.name)
         data = parse_data()
 
-        # Reverse
         for key in self.project.data:
             self.assertIn(key, data)
 
@@ -36,7 +35,7 @@ class TestParse(RandomProject):
             for key in self.project.data[section]:
                 self.assertIn(key, data[section])
 
-    def test_paarse_section_values(self):
+    def test_parsed_section_values(self):
         parse_data = Parse(self.project.name)
         data = parse_data()
         for section in self.project.data:
