@@ -17,23 +17,23 @@
 # along with Dodai.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from dodai.validate.database import IsValidDatabase
+from dodai.validate.field.schema import IsValidSchema
 
 
-class TestValidateDatabase(unittest.TestCase):
+class TestValidateSchema(unittest.TestCase):
 
     def setUp(self):
-        self._validate = IsValidDatabase.load(self.sections)
+        self._validate = IsValidSchema.load(self.sections)
 
     @property
     def sections(self):
         if not hasattr(self, '_sections_') or not self._sections_:
             self._sections_ = {
                 'blue': {
-                    'database': 'foo',
+                    'schema': 'foo',
                 },
                 'red': {
-                    'database': ''
+                    'schema': ''
                 },
             }
         return self._sections_

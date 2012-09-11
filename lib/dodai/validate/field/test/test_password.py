@@ -17,24 +17,24 @@
 # along with Dodai.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from dodai.validate.host import IsValidHost
+from dodai.validate.field.password import IsValidPassword
 
 
-class TestValidateHost(unittest.TestCase):
+class TestValidatePassword(unittest.TestCase):
 
     def setUp(self):
-        self._validate = IsValidHost.load(self.sections)
+        self._validate = IsValidPassword.load(self.sections)
 
     @property
     def sections(self):
         if not hasattr(self, '_sections_') or not self._sections_:
             self._sections_ = {
                 'blue': {
-                    'host': 'localhost',
+                    'password': 'foo',
                 },
                 'red': {
-                    'host': 'jpqoweirjqep'
-                }
+                    'password': ''
+                },
             }
         return self._sections_
 

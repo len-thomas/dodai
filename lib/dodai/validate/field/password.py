@@ -15,12 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Dodai.  If not, see <http://www.gnu.org/licenses/>.
 
-from dodai.validate.base import BaseValidate
+from dodai.validate.field.base import BaseValidate
 
-class IsValidSchema(BaseValidate):
+class IsValidPassword(BaseValidate):
 
     LOG_TYPE = "critical"
-    KEY = 'schema'
+    KEY = 'password'
 
     def __call__(self, section_name, key=None):
         key = key or self.KEY

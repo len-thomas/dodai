@@ -18,16 +18,16 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from dodai.validate.base import SectionExists
+from dodai.validate.field.base import SectionExists
 from dodai.process.ignore import ShouldIgnore
-from dodai.validate.dialect import IsValidDialect
-from dodai.validate.host import IsValidHost
-from dodai.validate.port import IsValidPort
-from dodai.validate.username import IsValidUsername
-from dodai.validate.password import IsValidPassword
-from dodai.validate.database import IsValidDatabase
-from dodai.validate.schema import IsValidSchema
-from dodai.validate.path import IsValidPath
+from dodai.validate.field.dialect import IsValidDialect
+from dodai.validate.field.host import IsValidHost
+from dodai.validate.field.port import IsValidPort
+from dodai.validate.field.username import IsValidUsername
+from dodai.validate.field.password import IsValidPassword
+from dodai.validate.field.database import IsValidDatabase
+from dodai.validate.field.schema import IsValidSchema
+from dodai.validate.field.path import IsValidPath
 
 
 

@@ -17,26 +17,23 @@
 # along with Dodai.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from dodai.validate.port import IsValidPort
+from dodai.validate.field.host import IsValidHost
 
 
-class TestValidatePort(unittest.TestCase):
+class TestValidateHost(unittest.TestCase):
 
     def setUp(self):
-        self._validate = IsValidPort.load(self.sections)
+        self._validate = IsValidHost.load(self.sections)
 
     @property
     def sections(self):
         if not hasattr(self, '_sections_') or not self._sections_:
             self._sections_ = {
                 'blue': {
-                    'port': '12345',
+                    'host': 'localhost',
                 },
                 'red': {
-                    'port': '6553555'
-                },
-                'orange': {
-                    'port': 'foo'
+                    'host': 'jpqoweirjqep'
                 }
             }
         return self._sections_
@@ -45,6 +42,5 @@ class TestValidatePort(unittest.TestCase):
         self.assertTrue(self._validate('blue'))
 
     def test_not_valid(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValueError) as e:
             self._validate('red')
-            self._validate('oragne')

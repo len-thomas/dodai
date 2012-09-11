@@ -17,24 +17,27 @@
 # along with Dodai.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from dodai.validate.dialect import IsValidDialect
+from dodai.validate.field.port import IsValidPort
 
 
-class TestValidateDialect(unittest.TestCase):
+class TestValidatePort(unittest.TestCase):
 
     def setUp(self):
-        self._validate = IsValidDialect.load(self.sections)
+        self._validate = IsValidPort.load(self.sections)
 
     @property
     def sections(self):
         if not hasattr(self, '_sections_') or not self._sections_:
             self._sections_ = {
                 'blue': {
-                    'dialect': 'postgresql',
+                    'port': '12345',
                 },
                 'red': {
-                    'dialect': 'foo'
+                    'port': '6553555'
                 },
+                'orange': {
+                    'port': 'foo'
+                }
             }
         return self._sections_
 
@@ -42,5 +45,6 @@ class TestValidateDialect(unittest.TestCase):
         self.assertTrue(self._validate('blue'))
 
     def test_not_valid(self):
-        with self.assertRaises(ValueError) as e:
+        with self.assertRaises(ValueError):
             self._validate('red')
+            self._validate('oragne')

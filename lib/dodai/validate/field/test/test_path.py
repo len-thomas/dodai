@@ -17,23 +17,23 @@
 # along with Dodai.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from dodai.validate.schema import IsValidSchema
+from dodai.validate.field.path import IsValidPath
 
 
-class TestValidateSchema(unittest.TestCase):
+class TestValidatePath(unittest.TestCase):
 
     def setUp(self):
-        self._validate = IsValidSchema.load(self.sections)
+        self._validate = IsValidPath.load(self.sections)
 
     @property
     def sections(self):
         if not hasattr(self, '_sections_') or not self._sections_:
             self._sections_ = {
                 'blue': {
-                    'schema': 'foo',
+                    'path': '~/._dodai__dodai_/db',
                 },
                 'red': {
-                    'schema': ''
+                    'path': ''
                 },
             }
         return self._sections_

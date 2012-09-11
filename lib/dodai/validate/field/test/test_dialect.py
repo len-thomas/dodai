@@ -17,23 +17,23 @@
 # along with Dodai.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from dodai.validate.path import IsValidPath
+from dodai.validate.field.dialect import IsValidDialect
 
 
-class TestValidatePath(unittest.TestCase):
+class TestValidateDialect(unittest.TestCase):
 
     def setUp(self):
-        self._validate = IsValidPath.load(self.sections)
+        self._validate = IsValidDialect.load(self.sections)
 
     @property
     def sections(self):
         if not hasattr(self, '_sections_') or not self._sections_:
             self._sections_ = {
                 'blue': {
-                    'path': '~/._dodai__dodai_/db',
+                    'dialect': 'postgresql',
                 },
                 'red': {
-                    'path': ''
+                    'dialect': 'foo'
                 },
             }
         return self._sections_

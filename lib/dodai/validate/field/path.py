@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Dodai.  If not, see <http://www.gnu.org/licenses/>.
 
-from dodai.validate.base import BaseValidate
+from dodai.validate.field.base import BaseValidate
 
 class IsValidPath(BaseValidate):
 
@@ -27,4 +27,3 @@ class IsValidPath(BaseValidate):
         if self._validate_field(section_name, key):
             return True
         return False
-

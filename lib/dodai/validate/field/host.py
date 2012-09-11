@@ -15,15 +15,32 @@
 # You should have received a copy of the GNU General Public License
 # along with Dodai.  If not, see <http://www.gnu.org/licenses/>.
 
-from dodai.validate.base import BaseValidate
+import socket
+from dodai.validate.field.base import BaseValidate
 
-class IsValidDatabase(BaseValidate):
+class IsValidHost(BaseValidate):
+
+    MSG = "In the config section '{section_name}' the '{key}' of '{val}' "\
+          "is not valid.  Unable to resolve."
 
     LOG_TYPE = "critical"
-    KEY = 'database'
+    KEY = 'host'
 
     def __call__(self, section_name, key=None):
         key = key or self.KEY
         if self._validate_field(section_name, key):
-            return True
+
+            val = self._sections[section_name].get(key)
+            try:
+                data = socket.getaddrinfo(val, 80)
+            except socket.gaierror:
+                return self._raise_error(section_name, key, val)
+            else:
+                if not data:
+                    return self._raise_error(section_name, key, val)
+                return True
+        return False
+
+    def _raise_error(self, section_name, key, val):
+        self._process_error(section_name=section_name, key=key, val=val)
         return False

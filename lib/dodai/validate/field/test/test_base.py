@@ -17,9 +17,9 @@
 # along with Dodai.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from dodai.validate.base import SectionExists
-from dodai.validate.base import KeyExists
-from dodai.validate.base import ValueExists
+from dodai.validate.field.base import SectionExists
+from dodai.validate.field.base import KeyExists
+from dodai.validate.field.base import ValueExists
 
 
 class MockLogger(object):
