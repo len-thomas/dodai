@@ -1,4 +1,4 @@
-# Copyright (C) 2011 Leonard Thomas
+# Copyright (C) 2012 Leonard Thomas
 #
 # This file is part of Dodai.
 #
@@ -18,11 +18,23 @@
 import sys
 import os
 import platform
+import tempfile
 from collections import namedtuple
 
-def home_direcotry(project_name=None):
+def tmp_directory():
+    """Returns the tmp directory as set by the system
+    """
+    def _find_tmp_direcotry__():
+        with tempfile.NamedTemporaryFile() as f:
+            name = os.path.dirname(f.name)
+        return name
+    return _find_tmp_direcotry__()
+
+def home_directory(project_name=None):
     """Return the full real path of this script user's home directory.
-    The passed in project name will be appended to the home directory.
+
+    :param project_name: The passed in project name will be appended to
+        the home directory.
     """
     if project_name:
         project_name = project_name.strip()
@@ -43,6 +55,9 @@ def home_direcotry(project_name=None):
 def system_config_directory(project_name=None):
     """Returns the full real path to the system config directory with the
     passed in project_name appended.  Does not work on windows.
+
+    :param project_name: The passed in project name will be appended to
+        the system config directory.
     """
     if project_name:
         project_name = project_name.strip()
@@ -68,9 +83,10 @@ def system_encoding():
     return _find_the_system_encoding__()
 
 def project_config_directory(with_config=True):
-    """Returns the directory of where this executable is running from.  When
-    'with_config' is set to True then 'config' will be appended to the
-    returned value
+    """Returns the directory of where this executable is running from.
+
+    :param with_config" if set to True then 'config' will be appended to the
+        returned value
     """
     path = os.path.dirname(os.path.abspath(sys.argv[0]))
     if with_config:
@@ -80,11 +96,14 @@ def project_config_directory(with_config=True):
 
 def config_directories(project_name):
     """Returns a list of the possible project config directories
+
+    :param project_name: The name of the project which is used to build
+        the directories
     """
     return [
         project_config_directory(),
         system_config_directory(project_name),
-        home_direcotry(project_name)
+        home_directory(project_name)
     ]
 
 
@@ -173,8 +192,16 @@ class ConfigFiles(object):
 
 def config_files(project_name, filenames=None):
     """Returns a list of (filename, encoding) of the config filenames that
-    actually exist on the system.  Passed in filenames (list or string) can
-    override the defaults
+    actually exist on the system.
+
+    :param project_name: the name of the project that will be used to find
+        the config files
+
+    :param filenames: A list of complete file paths that will added to the
+        list of config files that exist on the system. The file path can also
+        be a tuple (filename, encoding).  If the encoding is not given the
+        default system encoding will be used.
+
     """
     find_config_files = ConfigFiles.load(project_name)
     return find_config_files(filenames)

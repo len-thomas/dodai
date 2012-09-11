@@ -209,7 +209,7 @@ class _Project(_Base):
         home directory
         """
         if not self._project_config_directory_:
-            self._project_config_directory_ = find.home_direcotry(
+            self._project_config_directory_ = find.home_directory(
                             project_name=self.name)
         return self._project_config_directory_
 
@@ -234,7 +234,7 @@ class _Project(_Base):
         directory already exists, a new name will be generated
         """
         project_name = self._build_random_text()
-        dir = find.home_direcotry(project_name=project_name)
+        dir = find.home_directory(project_name=project_name)
         if os.path.exists(dir):
             return self._build_project_name()
         else:
@@ -246,7 +246,7 @@ class _Project(_Base):
         Also creates a empty file which is used to identify this as a test
         directory.
         """
-        path = find.home_direcotry(project_name=project_name)
+        path = find.home_directory(project_name=project_name)
         os.mkdir(path)
         filename = os.path.join(path, '___dodai_test___')
         f = open(filename, 'w')
@@ -255,7 +255,7 @@ class _Project(_Base):
     def clean_up(self):
         """This recursively removes any dodai test config directories
         """
-        path = find.home_direcotry()
+        path = find.home_directory()
         dirs = []
         for name in os.listdir(path):
             if name.startswith("."):
@@ -314,5 +314,3 @@ class RandomProject(unittest.TestCase):
 
         # Clean up any test config directories
         self.project.clean_up()
-
-

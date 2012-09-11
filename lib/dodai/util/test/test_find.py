@@ -1,4 +1,4 @@
-# Copyright (C) 2011  Leonard Thomas
+# Copyright (C) 2012  Leonard Thomas
 #
 # This file is part of Dodai.
 #
@@ -20,18 +20,26 @@ from dodai.util import find
 import os
 import sys
 import platform
+import tempfile
+from dodai.util.test.fixture import UtilFixture
 
 class TestBasicFind(unittest.TestCase):
 
     def setUp(self):
         self.project = 'test'
 
+    def test_find_tmp_directory(self):
+        with tempfile.NamedTemporaryFile() as f:
+            should_be = os.path.dirname(f.name)
+        value = find.tmp_directory()
+        self.assertEqual(should_be, value)
+
     def test_find_home_directory(self):
-        directory = find.home_direcotry()
+        directory = find.home_directory()
         self.assertTrue(os.path.exists(directory))
 
     def test_find_home_directory_with_project(self):
-        directory = find.home_direcotry(self.project)
+        directory = find.home_directory(self.project)
         self.assertTrue(directory.endswith(self.project))
 
     def test_find_system_config_directory(self):
@@ -63,71 +71,95 @@ class TestBasicFind(unittest.TestCase):
             self.assertGreater(len(encoding), 0)
 
 
-
 class TestFindConfigFiles(unittest.TestCase):
 
-    @property
-    def project(self):
-        if not hasattr(self, '_project_') or not self._project_:
-            self._project_ = "__test__dodai__"
-        return self._project_
+    @classmethod
+    def setUpClass(cls):
+        cls._fixture = UtilFixture.load()
 
-    @property
-    def filenames(self):
-        if not hasattr(self, '_filenames_') or not self._filenames_:
-            self._filenames_ = []
-            directory = find.home_direcotry(self.project)
-            names = ['cfg', 'connection.txt', 'databases.ini']
-            for name in names:
-                self._filenames_.append(os.path.join(directory, name))
-        return self._filenames_
+    @classmethod
+    def tearDownClass(cls):
+        cls._fixture.destroy()
 
-    @property
-    def custom_filenames(self):
-        if (not hasattr(self, '_custom_filenames_')
-                                        or not self._custom_filenames_):
-            directory = find.home_direcotry(self.project)
-            self._custom_filenames_ = []
-            names = ['__test_dodai_filename__', '__another_test_dodai_file']
-            for name in names:
-                self._custom_filenames_.append(os.path.join(directory, name))
-        return self._custom_filenames_
+    def test_find_config_file_object_one(self):
+        error_message = "The file '{0}' should have been loaded by the "\
+                        "dodai.util.find.ConfigFile object."
 
-    def setUp(self):
-
-        # make sure the test directory is deleted
-        self._clean_up()
-
-        directory = find.home_direcotry(self.project)
-        os.mkdir(directory)
-
-        all_files = self.filenames + self.custom_filenames
-
-        for path in all_files:
-            with open(path, 'w') as f:
-                pass
-
-    def tearDown(self):
-        self._clean_up()
-
-    def _clean_up(self):
-        directory = find.home_direcotry(self.project)
-        if os.path.exists(directory):
-            if os.path.isdir(directory):
-                for root, dirs, files in os.walk(directory, topdown=False):
-                    for name in files:
-                        os.remove(os.path.join(root, name))
-                    for name in dirs:
-                        os.rmdir(os.path.join(root, name))
-                os.rmdir(directory)
-            else:
-                os.remove(directory)
-
-
-    def test_find_config_file_object(self):
-        obj = find.ConfigFiles(find.config_directories(self.project),
+        obj = find.ConfigFiles(find.config_directories(self._fixture.PROJECT),
                                find.system_encoding())
-        results = self.filenames + self.custom_filenames
-        files = obj(self.custom_filenames)
+        files = obj(self._fixture.custom_filenames)
         for name in files:
-            self.assertTrue(name.name in results)
+            msg = error_message.format(name)
+            self.assertTrue(name.name in self._fixture.good_filenames, msg=msg)
+
+    def test_find_config_file_object_two(self):
+        error_message = "The file '{0}' should have been loaded by the "\
+                        "dodai.util.find.ConfigFile object"
+
+        obj = find.ConfigFiles(find.config_directories(self._fixture.PROJECT),
+                               find.system_encoding())
+        files = obj(self._fixture.custom_filenames)
+
+        loaded_files = []
+        for name in files:
+            loaded_files.append(name.name)
+
+        for name in self._fixture.good_filenames:
+            msg = error_message.format(name)
+            self.assertTrue(name in loaded_files, msg=msg)
+
+    def test_find_config_file_object_three(self):
+        error_message = "The file '{0}' should NOT have been loaded by the "\
+                        "dodai.util.find.ConfigFile object"
+
+        obj = find.ConfigFiles(find.config_directories(self._fixture.PROJECT),
+                               find.system_encoding())
+        files = obj(self._fixture.custom_filenames)
+
+        loaded_files = []
+        for name in files:
+            loaded_files.append(name.name)
+
+        for name in self._fixture.bogus_filenames:
+            msg = error_message.format(name)
+            self.assertFalse(name in loaded_files, msg=msg)
+
+    def test_find_config_files_one(self):
+        error_message = "The file '{0}' should have been loaded by the "\
+                        "dodai.util.find.config_files function."
+
+        files = find.config_files(self._fixture.PROJECT,
+                                  self._fixture.custom_filenames)
+        for name in files:
+            msg = error_message.format(name)
+            self.assertTrue(name.name in self._fixture.good_filenames, msg=msg)
+
+    def test_find_config_files_two(self):
+        error_message = "The file '{0}' should have been loaded by the "\
+                        "dodai.util.find.config_files function"
+
+        files = find.config_files(self._fixture.PROJECT,
+                                  self._fixture.custom_filenames)
+
+        loaded_files = []
+        for name in files:
+            loaded_files.append(name.name)
+
+        for name in self._fixture.good_filenames:
+            msg = error_message.format(name)
+            self.assertTrue(name in loaded_files, msg=msg)
+
+    def test_find_config_files_three(self):
+        error_message = "The file '{0}' should NOT have been loaded by the "\
+                        "dodai.util.find.conf_files function"
+
+        files = find.config_files(self._fixture.PROJECT,
+                                  self._fixture.custom_filenames)
+
+        loaded_files = []
+        for name in files:
+            loaded_files.append(name.name)
+
+        for name in self._fixture.bogus_filenames:
+            msg = error_message.format(name)
+            self.assertFalse(name in loaded_files, msg=msg)
