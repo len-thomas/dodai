@@ -106,7 +106,6 @@ def config_directories(project_name):
         home_directory(project_name)
     ]
 
-
 class ConfigFiles(object):
     """Callable object used to find config files that will be parsed
     """
@@ -187,7 +186,6 @@ class ConfigFiles(object):
                     out.append(root)
                     out.append(".{0}".format(root))
         return out
-
 
 
 def config_files(project_name, filenames=None):

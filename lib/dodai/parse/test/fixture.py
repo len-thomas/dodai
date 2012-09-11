@@ -19,7 +19,6 @@ import os
 import sys
 import random
 import configparser
-import unittest
 from collections import OrderedDict
 from dodai.util import find
 
@@ -162,7 +161,7 @@ class _ProjectConfigFile(_Base):
         return data
 
 
-class _Project(_Base):
+class ParseIniFixture(_Base):
     """Object used to generate a random project along with all of it's config
     files for testing.
     """
@@ -174,6 +173,23 @@ class _Project(_Base):
         self.data = OrderedDict()
         self.db_data = OrderedDict()
         self._build_config_file_ = None
+
+    @classmethod
+    def load(cls):
+        obj = cls()
+        obj.build()
+        return obj
+
+    def build(self):
+        # Clean up any old test config directories
+        self.clean_up()
+
+        # Build the config files
+        self.build_files()
+
+    def destroy(self):
+
+        self.clean_up()
 
     @property
     def _build_config_file(self):
@@ -290,27 +306,3 @@ class _Project(_Base):
         # Loop through each config file name and build the names
         for config_file in self.project_config_files:
             self._build_config_file(config_file)
-
-
-
-class RandomProject(unittest.TestCase):
-
-    @property
-    def project(self):
-        if not hasattr(self, 'project__') or not self.project__:
-            self.project__ = _Project()
-        return self.project__
-
-
-    def setUp(self):
-
-        # Clean up any old test config directories
-        self.project.clean_up()
-
-        # Build the config files
-        self.project.build_files()
-
-    def tearDown(self):
-
-        # Clean up any test config directories
-        self.project.clean_up()
