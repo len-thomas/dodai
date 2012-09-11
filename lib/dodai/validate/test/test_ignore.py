@@ -16,7 +16,7 @@
 # along with Dodai.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from dodai.process.ignore import ShouldIgnore
+from dodai.validate.ignore import ShouldIgnore
 
 class TestShouldIgnore(unittest.TestCase):
 

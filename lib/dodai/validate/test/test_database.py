@@ -16,8 +16,8 @@
 # along with Dodai.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from dodai.process.database_connection import IsDatabaseConnectionSection
-from dodai.process.database_connection import IsValidDatabaseConnectionSection
+from dodai.validate.database import IsDatabaseConnectionSection
+from dodai.validate.database import IsValidDatabaseConnectionSection
 
 class TestIsDatabaseConnectionSection(unittest.TestCase):
 
