@@ -55,6 +55,18 @@ def system_config_directory(project_name=None):
             return path
     return None
 
+def system_encoding():
+    """Returns the system's character encoding
+    """
+
+    def _find_the_system_encoding__():
+        encoding = sys.getfilesystemencoding()
+        if not encoding:
+            encoding = sys.getdefaultencoding()
+        return encoding
+
+    return _find_the_system_encoding__()
+
 def project_config_directory(with_config=True):
     """Returns the directory of where this executable is running from.  When
     'with_config' is set to True then 'config' will be appended to the
@@ -89,41 +101,60 @@ class ConfigFiles(object):
     FILENAME_EXTENSIONS = ('cfg', 'txt', 'ini', '',)
     FIELDS = ('name', 'encoding')
 
-    def __init__(self, get_directories=None):
-        self._get_directories = get_directories or config_directories
-        self._encoding = None
+    def __init__(self, directories, default_encoding):
+        self.directories = directories
+        self.default_encoding = default_encoding
         self._make = namedtuple('config_file', self.FIELDS)
 
-    def __call__(self, project_name, filenames=None, encoding=None):
+    @classmethod
+    def load(cls, project_name):
+        directories = config_directories(project_name)
+        default_encoding = system_encoding()
+        return cls(directories, default_encoding)
+
+    def __call__(self, filenames=None):
         """Returns a list of (filename, encoding) of config files that
-        actually exist on the system.  Filenames is passed in will override
-        the default searches
+        actually exist in the filesystem.
+
+        :param filenames: A list of complete file paths that will
+            added to the list of config files that exist on the system. The
+            file path can also be a tuple (filename, encoding).  If the
+            encoding is not given the default system encoding will be used
         """
         out = []
-        encoding = encoding or self.encoding
-        filenames = self._format_filenames(filenames)
-        if not filenames:
-            filenames = self._build_paths(project_name)
-        for filename in filenames:
-            if os.path.exists(filename) and os.path.isfile(filename):
-                out.append(self._make(filename, encoding))
+        possible_filenames = self._build_list_of_possible_filenames(filenames)
+        for possible_filename in possible_filenames:
+            if (os.path.exists(possible_filename.name)
+                    and os.path.isfile(possible_filename.name)):
+                out.append(possible_filename)
         return out
 
-    def _format_filenames(self, filenames):
-        out = []
+    def _build_list_of_possible_filenames(self, filenames):
+        possible_filenames = []
         if filenames:
-            if isinstance(filenames, str):
-                filenames = [filenames]
             for filename in filenames:
-                out.append(os.path.expanduser(filename))
-        return out
+                if isinstance(filename, tuple):
+                    if len(filename) > 1:
+                        possible_filenames.append(
+                                self._make(filename[0], filename[1])
+                        )
+                    elif len(filename) == 1:
+                        possible_filenames.append(
+                                self._make(filename[0], self.default_encoding)
+                        )
+                else:
+                    possible_filenames.append(
+                            self._make(filename, self.default_encoding)
+                    )
 
-    def _build_paths(self, project_name):
-        out = []
-        for directory in self._get_directories(project_name):
+        # Build all the possible default paths
+        for directory in self.directories:
             for filename in self._build_filenames():
-                out.append(os.path.join(directory, filename))
-        return out
+                filename = os.path.join(directory, filename)
+                possible_filenames.append(
+                        self._make(filename, self.default_encoding)
+                )
+        return possible_filenames
 
     def _build_filenames(self):
         out = []
@@ -138,21 +169,12 @@ class ConfigFiles(object):
                     out.append(".{0}".format(root))
         return out
 
-    @property
-    def encoding(self):
-        """Returns the system's encoding
-        """
-        if not self._encoding:
-            self._encoding = sys.getfilesystemencoding()
-            if not self._encoding:
-                self._encoding = sys.getdefaultencoding()
-        return self._encoding
 
 
-def config_files(project_name, filenames=None, encoding=None):
+def config_files(project_name, filenames=None):
     """Returns a list of (filename, encoding) of the config filenames that
     actually exist on the system.  Passed in filenames (list or string) can
     override the defaults
     """
-    find_config_files = ConfigFiles()
-    return find_config_files(project_name, filenames, encoding)
+    find_config_files = ConfigFiles.load(project_name)
+    return find_config_files(filenames)
