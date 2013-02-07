@@ -198,7 +198,7 @@ def install_requires(*packages):
 
 ARGS = dict(
     zip_safe=False,
-    package_dir={'':'lib'},
+    #package_dir={'':'lib'},
     packages=['dodai'],
     platforms=['Linux', 'Darwin'],
     test_suite='dodai.test_all.run',
