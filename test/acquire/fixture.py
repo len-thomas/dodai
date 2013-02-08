@@ -31,7 +31,7 @@ SECTIONS_01 = {
 SECTIONS_02 = {
     'default': {
         'port': 123,
-        'environment': 'prod',
+        'environment': 'stage',
     },
     'info': {
         'port': 123
@@ -42,6 +42,24 @@ SECTIONS_03 = {
     'default': {
         'port': 123,
         'environment': '\u5148\u751f',
+    },
+    'info': {
+        'port': 123
+    }
+}
+
+SECTIONS_04 = {
+    'default': {
+        'port': 123,
+    },
+    'info': {
+        'port': 123
+    }
+}
+
+SECTIONS_05 = {
+    'blah': {
+        'port': 123,
     },
     'info': {
         'port': 123

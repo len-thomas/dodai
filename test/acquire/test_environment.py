@@ -27,3 +27,23 @@ class TestAcquireEnvironment(unittest.TestCase):
         acquire = AcquireEnvironment.load(fixture.SECTIONS_01)
         val = acquire()
         self.assertEqual(val, 'prod')
+
+    def test_acquire_environment_two(self):
+        acquire = AcquireEnvironment.load(fixture.SECTIONS_02)
+        val = acquire()
+        self.assertEqual(val, 'stage')
+
+    def test_acquire_environment_three(self):
+        acquire = AcquireEnvironment.load(fixture.SECTIONS_03)
+        val = acquire()
+        self.assertEqual(val, '\u5148\u751f')
+
+    def test_acquire_environment_four(self):
+        acquire = AcquireEnvironment.load(fixture.SECTIONS_04)
+        val = acquire()
+        self.assertEqual(val, 'dev')
+
+    def test_acquire_environment_five(self):
+        acquire = AcquireEnvironment.load(fixture.SECTIONS_05)
+        val = acquire()
+        self.assertEqual(val, 'dev')
