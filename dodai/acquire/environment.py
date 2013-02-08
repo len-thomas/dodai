@@ -16,13 +16,13 @@
 # along with Dodai.  If not, see <http://www.gnu.org/licenses/>.
 
 
-class Find(object):
+class AcquireEnvironment(object):
     """Callable used to figure out the enviornment (eg.. prod, stage,
     dev etc..).
     """
 
     ENVIRONMENT_SEARCH_SECTIONS = ('server', 'basic', 'default', 'system',
-                                   'main')
+                                   'main', 'config')
     ENVIRONMENT_FIELD_NAMES = ('environment', 'env',)
     ENVIRONMENT_DEFAULT = 'dev'
 
@@ -50,6 +50,35 @@ class Find(object):
         return cls(sections, log, value, section_name, field_name,
                    default_value)
 
+    def _find(self, section_name, field_name):
 
-    def __call__(self):
-        pass
+        if section_name in self._sections:
+            if field_name in self._sections[section_name]:
+                return self._sections[section_name][field_name]
+        return None
+
+    def __call__(self, section_name=None, field_name=None,
+                 default_value=None):
+        section_name = section_name or self._section_name
+        field_name = field_name or self._field_name
+        default_value = default_value or self._default_value
+        out = None
+
+        if section_name:
+            section_names = (section_name,)
+        else:
+            section_names = self.ENVIRONMENT_SEARCH_SECTIONS
+
+        if field_name:
+            field_names = (field_name,)
+        else:
+            field_names = self.ENVIRONMENT_FIELD_NAMES
+
+        for section_name in section_names:
+            for field_name in field_names:
+                out = self._find(section_name, field_name)
+                if out:
+                    return out
+
+        return default_value
+
