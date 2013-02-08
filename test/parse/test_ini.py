@@ -16,7 +16,7 @@
 # along with Dodai.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
-from dodai.parse.test.fixture import ParseIniFixture
+from test.parse.fixture import ParseIniFixture
 from dodai.parse.ini import ParseIni
 
 

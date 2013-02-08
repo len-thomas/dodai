@@ -21,7 +21,7 @@ import os
 import sys
 import platform
 import tempfile
-from dodai.util.test.fixture import UtilFixture
+from test.util.fixture import UtilFixture
 
 class TestBasicFind(unittest.TestCase):
 

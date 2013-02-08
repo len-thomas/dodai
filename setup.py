@@ -201,7 +201,7 @@ ARGS = dict(
     #package_dir={'':'lib'},
     packages=['dodai'],
     platforms=['Linux', 'Darwin'],
-    test_suite='dodai.test_all.run',
+    test_suite='test.all.run',
     install_requires=install_requires('psycopg2', 'mysql-python', 'cx_oracle',
                                       'SQLALchemy'),
     **META
